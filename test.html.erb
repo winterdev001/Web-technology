@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <h1>Test</h1>
+
+    <% require 'pg' %>
+
+    <% connection = PG::connect(dbname: "goya") %>
+    <% connection.internal_encoding = "UTF-8" %>   
+    <%# This result variable output the weight and give_for columns where the the give_for is not equal to '自家消費'  %>
+    <% result = connection.exec("select weight,give_for FROM crops WHERE  give_for!='自家消費';") %>
+    <% date = [] %>
+
+    <% result.each do |record|  %>
+      <%  date << "Size of bitter gourd: #{record["weight"]} &nbsp;&nbsp; Sold to: #{record["give_for"]}" "<br>" %>
+    <% end %>
+
+    <form action="goya.cgi" method="POST">
+      Press the button below to jump to the size of the bitter gourd and the information page of the buyer where transferee is not self-consumption<br><br>
+      <!-- Substitute the data you want to send for value -->
+      <!-- Make name = "goya" a mark of information -->
+      <input type="text" name="goya" value="<%= date.join(' ')%>">
+      <input type="submit" name="submit" >
+    </form>
+
+    <%# This result1 variable output all columns from goya where the quality is poor  %>
+    <% result1 = connection.exec("select * FROM crops WHERE quality ='false';") %>
+    <% date = [] %>
+
+    <% result1.each do |record|  %>
+      <%  date << "Size of bitter gourd: #{record["weight"]} &nbsp;&nbsp;  Sold to: #{record["give_for"]} &nbsp;&nbsp; The quality: #{record["quality"]}" "<br>" %>
+    <% end %>
+
+    <form action="goya1.cgi" method="POST">
+      Press the button below to jump to the page that display all from table crops with poor quality<br><br>
+      <!-- Substitute the data you want to send for value -->
+      <!-- Make name = "goya" a mark of information -->
+      <input type="text" name="goya1" value="<%= date.join(' ')%>">
+      <input type="submit" name="submit" >
+    </form>
+  </body>
+</html>
